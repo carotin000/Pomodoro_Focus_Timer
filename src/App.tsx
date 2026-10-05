@@ -75,22 +75,18 @@ export default function App() {
   const totalTime = settings[mode] * 60;
   const progress = totalTime > 0 ? (totalTime - timeLeft) / totalTime : 0;
 
-  // Save settings
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify(settings));
   }, [settings]);
 
-  // Save stats
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY_STATS, JSON.stringify(stats));
   }, [stats]);
 
-  // Save session count
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY_SESSION_COUNT, sessionCount.toString());
   }, [sessionCount]);
 
-  // Timer logic
   useEffect(() => {
     if (isRunning) {
       intervalRef.current = setInterval(() => {
@@ -98,7 +94,6 @@ export default function App() {
           if (prev <= 1) {
             if (intervalRef.current) clearInterval(intervalRef.current);
             setIsRunning(false);
-            // Timer completed
             if (mode === 'focus') {
               setStats((s) => ({
                 ...s,
@@ -107,7 +102,6 @@ export default function App() {
               }));
               setSessionCount((c) => c + 1);
             }
-            // Play notification sound
             try {
               const audioCtx = new AudioContext();
               const oscillator = audioCtx.createOscillator();
@@ -158,7 +152,6 @@ export default function App() {
     setShowSettings(false);
   };
 
-  // Mode-specific colors
   const getColors = () => {
     switch (mode) {
       case 'focus':
@@ -191,7 +184,6 @@ export default function App() {
 
   return (
     <div className={`min-h-screen ${colors.bg} flex flex-col items-center justify-center p-4 transition-all duration-700`}>
-      {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
           🍅 Pomodoro Timer
@@ -199,7 +191,6 @@ export default function App() {
         <p className="text-slate-400 mt-2 text-sm">Фокусируйся. Отдыхай. Достигай.</p>
       </div>
 
-      {/* Mode Tabs */}
       <div className="flex gap-2 mb-8 bg-slate-800/50 backdrop-blur-sm rounded-xl p-1.5">
         {(Object.keys(MODE_LABELS) as TimerMode[]).map((m) => (
           <button
@@ -216,10 +207,8 @@ export default function App() {
         ))}
       </div>
 
-      {/* Timer Circle */}
       <div className="relative mb-8">
         <svg width="320" height="320" className="-rotate-90">
-          {/* Background circle */}
           <circle
             cx="160"
             cy="160"
@@ -229,7 +218,6 @@ export default function App() {
             className="text-slate-700/50"
             strokeWidth="8"
           />
-          {/* Progress circle */}
           <circle
             cx="160"
             cy="160"
@@ -242,7 +230,6 @@ export default function App() {
             strokeDashoffset={strokeDashoffset}
           />
         </svg>
-        {/* Timer display */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span className="text-6xl md:text-7xl font-mono font-bold text-white tracking-wider">
             {formatTime(timeLeft)}
@@ -258,7 +245,6 @@ export default function App() {
         </div>
       </div>
 
-      {/* Controls */}
       <div className="flex gap-4 mb-8">
         {!isRunning ? (
           <button
@@ -284,7 +270,6 @@ export default function App() {
         </button>
       </div>
 
-      {/* Stats */}
       <div className="bg-slate-800/40 backdrop-blur-sm rounded-2xl p-6 w-full max-w-sm border border-slate-700/50">
         <h2 className="text-white font-semibold text-center mb-4">📊 Статистика сегодня</h2>
         <div className="grid grid-cols-2 gap-4">
@@ -320,7 +305,6 @@ export default function App() {
         )}
       </div>
 
-      {/* Settings Button */}
       <button
         onClick={() => {
           setTempSettings(settings);
@@ -331,7 +315,6 @@ export default function App() {
         ⚙️ Настройки
       </button>
 
-      {/* Settings Modal */}
       {showSettings && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-slate-800 rounded-2xl p-6 w-full max-w-sm border border-slate-700 shadow-2xl">
@@ -399,7 +382,6 @@ export default function App() {
         </div>
       )}
 
-      {/* Footer */}
       <div className="mt-8 text-center text-xs text-slate-600">
         Данные сохраняются автоматически • {new Date().toLocaleDateString('ru-RU')}
       </div>
