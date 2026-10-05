@@ -218,7 +218,7 @@ export default function App() {
 
       {/* Timer Circle */}
       <div className="relative mb-8">
-        <svg width="320" height="320" className="transform -rotate-90">
+        <svg width="320" height="320" className="-rotate-90">
           {/* Background circle */}
           <circle
             cx="160"
