@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 type TimerMode = 'focus' | 'shortBreak' | 'longBreak';
 
@@ -22,30 +22,6 @@ const MODE_LABELS: Record<TimerMode, string> = {
   focus: 'Фокусировка',
   shortBreak: 'Короткий перерыв',
   longBreak: 'Длинный перерыв',
-};
-
-const MODE_COLORS: Record<TimerMode, { bg: string; ring: string; text: string; btn: string; btnHover: string }> = {
-  focus: {
-    bg: 'from-red-950 via-slate-900 to-slate-950',
-    ring: 'stroke-red-500',
-    text: 'text-red-400',
-    btn: 'bg-red-600 hover:bg-red-500',
-    btnHover: 'hover:bg-red-900/50',
-  },
-  shortBreak: {
-    bg: 'from-emerald-950 via-slate-900 to-slate-950',
-    ring: 'stroke-emerald-500',
-    text: 'text-emerald-400',
-    btn: 'bg-emerald-600 hover:bg-emerald-500',
-    btnHover: 'hover:bg-emerald-900/50',
-  },
-  longBreak: {
-    bg: 'from-blue-950 via-slate-900 to-slate-950',
-    ring: 'stroke-blue-500',
-    text: 'text-blue-400',
-    btn: 'bg-blue-600 hover:bg-blue-500',
-    btnHover: 'hover:bg-blue-900/50',
-  },
 };
 
 function getTodayKey(): string {
@@ -120,7 +96,7 @@ export default function App() {
       intervalRef.current = setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
-            clearInterval(intervalRef.current!);
+            if (intervalRef.current) clearInterval(intervalRef.current);
             setIsRunning(false);
             // Timer completed
             if (mode === 'focus') {
@@ -156,12 +132,12 @@ export default function App() {
     };
   }, [isRunning, mode, settings.focus]);
 
-  const switchMode = useCallback((newMode: TimerMode) => {
+  const switchMode = (newMode: TimerMode) => {
     setMode(newMode);
     setTimeLeft(settings[newMode] * 60);
     setIsRunning(false);
     if (intervalRef.current) clearInterval(intervalRef.current);
-  }, [settings]);
+  };
 
   const handleStart = () => setIsRunning(true);
   const handlePause = () => {
@@ -182,12 +158,39 @@ export default function App() {
     setShowSettings(false);
   };
 
-  const colors = MODE_COLORS[mode];
+  // Mode-specific colors
+  const getColors = () => {
+    switch (mode) {
+      case 'focus':
+        return {
+          bg: 'bg-gradient-to-br from-red-950 via-slate-900 to-slate-950',
+          ring: 'stroke-red-500',
+          text: 'text-red-400',
+          btn: 'bg-red-600 hover:bg-red-500',
+        };
+      case 'shortBreak':
+        return {
+          bg: 'bg-gradient-to-br from-emerald-950 via-slate-900 to-slate-950',
+          ring: 'stroke-emerald-500',
+          text: 'text-emerald-400',
+          btn: 'bg-emerald-600 hover:bg-emerald-500',
+        };
+      case 'longBreak':
+        return {
+          bg: 'bg-gradient-to-br from-blue-950 via-slate-900 to-slate-950',
+          ring: 'stroke-blue-500',
+          text: 'text-blue-400',
+          btn: 'bg-blue-600 hover:bg-blue-500',
+        };
+    }
+  };
+
+  const colors = getColors();
   const circumference = 2 * Math.PI * 140;
   const strokeDashoffset = circumference * (1 - progress);
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${colors.bg} flex flex-col items-center justify-center p-4 transition-all duration-700`}>
+    <div className={`min-h-screen ${colors.bg} flex flex-col items-center justify-center p-4 transition-all duration-700`}>
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
@@ -241,7 +244,7 @@ export default function App() {
         </svg>
         {/* Timer display */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className={`text-6xl md:text-7xl font-mono font-bold text-white tracking-wider`}>
+          <span className="text-6xl md:text-7xl font-mono font-bold text-white tracking-wider">
             {formatTime(timeLeft)}
           </span>
           <span className={`text-sm font-medium mt-2 ${colors.text}`}>
